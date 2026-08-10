@@ -189,12 +189,12 @@ async function handleSubmit(event) {
         {
             title: `Fonte ATX ${recommendedWattage}W 80 Plus`,
             store: 'KaBuM!',
-            url: `https://www.kabum.com.br/busca?query=fonte+${recommendedWattage}w+80+plus`
+            url: `https://www.kabum.com.br/busca/fonte-atx-${recommendedWattage}w`
         },
         {
             title: `Fonte Modular ${recommendedWattage}W 80 Plus Gold`,
             store: 'Mercado Livre',
-            url: `https://lista.mercadolivre.com.br/fonte-${recommendedWattage}w-80-plus`
+            url: `https://lista.mercadolivre.com.br/fonte-atx-${recommendedWattage}w-80-plus`
         },
         {
             title: `Fonte de Alimentação ${recommendedWattage}W PC`,
