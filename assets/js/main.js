@@ -3,10 +3,7 @@ const gpuSelect = document.querySelector('#gpu-select');
 const form = document.querySelector('#hardware-form');
 const powerOutput = document.querySelector('#power-output');
 const powerDetails = document.querySelector('#power-details');
-const psuName = document.querySelector('#psu-name');
-const psuPower = document.querySelector('#psu-power');
-const psuRating = document.querySelector('#psu-rating');
-const psuLink = document.querySelector('#psu-link');
+const psuGrid = document.querySelector('#psu-grid');
 const bottleneckText = document.querySelector('#bottleneck-text');
 const bottleneckBar = document.querySelector('#bottleneck-bar');
 const resultBlock = document.querySelector('#result-block');
@@ -41,8 +38,20 @@ function formatWatts(value) {
     return `${value.toFixed(0)} W`;
 }
 
-function selectRecommendedPsu(requiredPower) {
-    return hardwareData.psus.find(psu => psu.power >= requiredPower) || hardwareData.psus[hardwareData.psus.length - 1];
+function selectRecommendedPsus(requiredPower) {
+    const candidates = hardwareData.psus
+        .filter(psu => psu.power >= requiredPower)
+        .sort((a, b) => a.power - b.power)
+        .slice(0, 3);
+
+    if (candidates.length > 0) {
+        return candidates;
+    }
+
+    return hardwareData.psus
+        .slice()
+        .sort((a, b) => a.power - b.power)
+        .slice(-3);
 }
 
 function openModal(pageKey) {
@@ -84,14 +93,32 @@ function evaluateBottleneck(cpuScore, gpuScore) {
     };
 }
 
-function updateResults({ consumption, recommendedPsu, bottleneck }) {
+function renderPsuCards(psus) {
+    psuGrid.innerHTML = psus
+        .map(psu => `
+            <div class="rounded-3xl border border-slate-800 bg-slate-900 p-4 shadow-sm shadow-slate-950/20">
+                <div class="overflow-hidden rounded-3xl bg-slate-800">
+                    <img src="${psu.image}" alt="${psu.name}" class="h-40 w-full object-cover" />
+                </div>
+                <div class="mt-4 space-y-3">
+                    <p class="text-lg font-semibold text-slate-100">${psu.name}</p>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="rounded-full bg-slate-800 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-slate-300">${psu.rating}</span>
+                        <span class="text-sm text-slate-400">${psu.power}W</span>
+                    </div>
+                    <a href="${psu.url}" target="_blank" rel="noopener noreferrer" class="inline-flex w-full justify-center rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500">
+                        Ver Oferta / Menor Preço
+                    </a>
+                </div>
+            </div>
+        `)
+        .join('');
+}
+
+function updateResults({ consumption, recommendedPsus, bottleneck }) {
     powerOutput.textContent = formatWatts(consumption);
     powerDetails.textContent = 'Inclui 100W adicionais para outros componentes e roteamento de reserva.';
-    psuName.textContent = recommendedPsu.name;
-    psuPower.textContent = `${recommendedPsu.power}W — Recomendado para sua configuração`;
-    psuRating.textContent = recommendedPsu.rating;
-    psuLink.href = recommendedPsu.url;
-    psuLink.textContent = 'Ver Oferta / Menor Preço';
+    renderPsuCards(recommendedPsus);
     bottleneckText.textContent = bottleneck.label;
     bottleneckBar.style.width = `${bottleneck.ratio}%`;
     resultBlock.classList.remove('opacity-80');
@@ -113,12 +140,12 @@ function handleSubmit(event) {
 
     const totalSystemWatts = cpu.tdp + gpu.tdp + BASE_SYSTEM_WATTS;
     const recommendedWatts = Math.ceil(totalSystemWatts * SAFETY_MARGIN / 50) * 50;
-    const recommendedPsu = selectRecommendedPsu(recommendedWatts);
+    const recommendedPsus = selectRecommendedPsus(recommendedWatts);
     const bottleneck = evaluateBottleneck(cpu.score, gpu.score);
 
     resultPlaceholder.classList.add('hidden');
     resultBlock.classList.remove('hidden');
-    updateResults({ consumption: totalSystemWatts, recommendedPsu, bottleneck });
+    updateResults({ consumption: totalSystemWatts, recommendedPsus, bottleneck });
 }
 
 populateSelects();

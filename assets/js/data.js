@@ -24,11 +24,62 @@ const hardwareData = {
         { id: 'amd-rx-7900-xtx', name: 'AMD Radeon RX 7900 XTX', tdp: 355, score: 17900 }
     ],
     psus: [
-        { id: 'psu-500w', name: 'Fonte 500W 80 Plus Bronze', power: 500, rating: '80 Plus Bronze', url: 'https://example.com/psu-500w' },
-        { id: 'psu-600w', name: 'Fonte 600W 80 Plus Bronze', power: 600, rating: '80 Plus Bronze', url: 'https://example.com/psu-600w' },
-        { id: 'psu-650w', name: 'Fonte 650W 80 Plus Gold', power: 650, rating: '80 Plus Gold', url: 'https://example.com/psu-650w' },
-        { id: 'psu-750w', name: 'Fonte 750W 80 Plus Gold', power: 750, rating: '80 Plus Gold', url: 'https://example.com/psu-750w' },
-        { id: 'psu-850w', name: 'Fonte 850W 80 Plus Platinum', power: 850, rating: '80 Plus Platinum', url: 'https://example.com/psu-850w' }
+        {
+            id: 'msi-mag-a650bn',
+            name: 'Fonte MSI MAG A650BN, 650W',
+            power: 650,
+            rating: '80 Plus Bronze',
+            image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80',
+            url: 'https://www.example.com/msi-mag-a650bn'
+        },
+        {
+            id: 'corsair-rm650x',
+            name: 'Fonte Corsair RM650X, 650W',
+            power: 650,
+            rating: '80 Plus Gold',
+            image: 'https://images.unsplash.com/photo-1527430253228-e93688616381?auto=format&fit=crop&w=600&q=80',
+            url: 'https://www.example.com/corsair-rm650x'
+        },
+        {
+            id: 'cooler-master-mwe-750',
+            name: 'Fonte Cooler Master MWE Gold, 750W',
+            power: 750,
+            rating: '80 Plus Gold',
+            image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80',
+            url: 'https://www.example.com/cooler-master-mwe-750'
+        },
+        {
+            id: 'xpg-core-850w',
+            name: 'Fonte XPG Core Reactor, 850W',
+            power: 850,
+            rating: '80 Plus Gold',
+            image: 'https://images.unsplash.com/photo-1561154464-65c1fa8d1bb6?auto=format&fit=crop&w=600&q=80',
+            url: 'https://www.example.com/xpg-core-850w'
+        },
+        {
+            id: 'gamemax-m-700',
+            name: 'Fonte Gamemax M700, 700W',
+            power: 700,
+            rating: '80 Plus Bronze',
+            image: 'https://images.unsplash.com/photo-1525182008055-f88b95ff7980?auto=format&fit=crop&w=600&q=80',
+            url: 'https://www.example.com/gamemax-m-700'
+        },
+        {
+            id: 'corsair-rm750x',
+            name: 'Fonte Corsair RM750X, 750W',
+            power: 750,
+            rating: '80 Plus Gold',
+            image: 'https://images.unsplash.com/photo-1531089073312-70a8879c30b4?auto=format&fit=crop&w=600&q=80',
+            url: 'https://www.example.com/corsair-rm750x'
+        },
+        {
+            id: 'msi-potent-850',
+            name: 'Fonte MSI Potent 850W',
+            power: 850,
+            rating: '80 Plus Bronze',
+            image: 'https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=600&q=80',
+            url: 'https://www.example.com/msi-potent-850'
+        }
     ],
     pages: {
         about: {
