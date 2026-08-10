@@ -54,29 +54,40 @@ function closeModal() {
     modal.classList.add('hidden');
 }
 
-function evaluateBottleneck(cpuScore, gpuScore) {
-    const difference = gpuScore - cpuScore;
-    const threshold = cpuScore * 0.35;
-    if (difference > threshold) {
-        return {
-            label: 'Gargalo de Processador em 1080p (Sua GPU é mais forte que o processador)',
-            ratio: 90
-        };
+function evaluateBottleneck(cpuScore, gpuScore, profile = '1080p') {
+    // profile-sensitive bottleneck evaluation
+    if (profile === '1080p') {
+        const cpuEffective = cpuScore * 1.3; // CPU importance increased for 1080p
+        if (cpuEffective < gpuScore) {
+            return { label: 'Gargalo de CPU em 1080p (Sua GPU é mais forte que o processador)', ratio: 90 };
+        }
+        if (cpuEffective > gpuScore * 1.35) {
+            return { label: 'Gargalo de GPU em 1080p (CPU acima do necessário)', ratio: 35 };
+        }
+        return { label: 'Equilíbrio para jogos em 1080p', ratio: 65 };
     }
 
-    const cpuDiff = cpuScore - gpuScore;
-    const thresholdGpu = gpuScore * 0.35;
-    if (cpuDiff > thresholdGpu) {
-        return {
-            label: 'Gargalo de Placa de Vídeo (Sua CPU sobra para esta GPU)',
-            ratio: 35
-        };
+    if (profile === '4k') {
+        const gpuEffective = gpuScore * 1.4; // GPU importance increased for 4K
+        if (gpuEffective > cpuScore) {
+            return { label: 'Limite de GPU em 4K (Gargalo de CPU insignificante)', ratio: 90 };
+        }
+        if (cpuScore > gpuEffective * 1.25) {
+            return { label: 'CPU dominante em 4K (GPU pode estar subutilizada)', ratio: 35 };
+        }
+        return { label: 'Equilíbrio para jogos em 4K', ratio: 60 };
     }
 
-    return {
-        label: 'Equilíbrio Excelente entre CPU e GPU',
-        ratio: 65
-    };
+    // render (conteúdo/produção): balance evaluation under sustained load
+    const diff = cpuScore - gpuScore;
+    const rel = Math.abs(diff) / Math.max(cpuScore, gpuScore);
+    if (diff < 0 && rel > 0.15) {
+        return { label: 'Gargalo de CPU em render (CPU abaixo do necessário para carga contínua)', ratio: 85 };
+    }
+    if (diff > 0 && rel > 0.15) {
+        return { label: 'Gargalo de GPU em render (GPU abaixo do necessário para cargas de render)', ratio: 35 };
+    }
+    return { label: 'Equilíbrio para render/produção', ratio: 65 };
 }
 
 function setSearchStatus(message) {
@@ -141,23 +152,38 @@ async function handleSubmit(event) {
     const cpu = getHardwareItem(hardwareData.cpus, selectedCpuId);
     const gpu = getHardwareItem(hardwareData.gpus, selectedGpuId);
 
-    const totalSystemWatts = cpu.tdp + gpu.tdp + BASE_SYSTEM_WATTS;
-    const bottleneck = evaluateBottleneck(cpu.score, gpu.score);
+    // 1) Recalcular potência total e aplicar margem de 25%
+    const baseTotal = cpu.tdp + gpu.tdp + BASE_SYSTEM_WATTS; // sem margem
+    const rawRequired = Math.ceil(baseTotal * SAFETY_MARGIN); // com margem aplicada
 
-    // determine recommended commercial wattage
-    const rawRequired = Math.ceil(totalSystemWatts * SAFETY_MARGIN);
-    const STANDARD_WATTAGES = [500, 550, 600, 650, 750, 850, 1000, 1200];
-    let recommendedWattage = STANDARD_WATTAGES.find(w => w >= rawRequired);
-    if (!recommendedWattage) recommendedWattage = STANDARD_WATTAGES[STANDARD_WATTAGES.length - 1];
+    // read selected profile
+    const profile = document.querySelector('input[name="profile"]:checked')?.value || '1080p';
 
+    // 2) Arredondar para potências comerciais conforme regras exatas
+    let recommendedWattage;
+    if (rawRequired <= 500) recommendedWattage = 500;
+    else if (rawRequired <= 550) recommendedWattage = 550;
+    else if (rawRequired <= 600) recommendedWattage = 600;
+    else if (rawRequired <= 650) recommendedWattage = 650;
+    else if (rawRequired <= 750) recommendedWattage = 750;
+    else if (rawRequired <= 850) recommendedWattage = 850;
+    else recommendedWattage = 1000;
+
+    const bottleneck = evaluateBottleneck(cpu.score, gpu.score, profile);
+
+    // 3) Atualização reativa do DOM
     resultPlaceholder.classList.add('hidden');
     resultBlock.classList.remove('hidden');
+    // exibe o valor exato calculado (com margem) no #power-output
+    powerOutput.textContent = formatWatts(rawRequired);
+    powerDetails.textContent = `Recomendação comercial mínima com margem aplicada: ${recommendedWattage}W`;
+    bottleneckText.textContent = bottleneck.label;
+    bottleneckBar.style.width = `${bottleneck.ratio}%`;
+
+    // Limpa e gera as 3 sugestões 100% client-side usando recommendedWattage
     psuGrid.innerHTML = '';
     setSearchStatus('Opções recomendadas para o seu sistema:');
-    showSkeletons();
-    updateResults({ consumption: totalSystemWatts, bottleneck });
 
-    // generate 3 client-side suggestions with direct search links
     const suggestions = [
         {
             title: `Fonte ATX ${recommendedWattage}W 80 Plus`,
@@ -182,7 +208,7 @@ async function handleSubmit(event) {
         }
     ];
 
-    // immediately render the generated suggestions
+    // Renderiza imediatamente os cards (sem dependência de backend)
     renderPsuCards(suggestions);
 }
 
