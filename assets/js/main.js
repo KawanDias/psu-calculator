@@ -199,7 +199,7 @@ async function handleSubmit(event) {
         {
             title: `Fonte de Alimentação ${recommendedWattage}W PC`,
             store: 'Amazon',
-            url: `https://www.amazon.com.br/s?k=fonte+${recommendedWattage}w+80+plus`
+            url: `https://www.amazon.com.br/s?k=fonte+atx+${recommendedWattage}w+80+plus&tag=kawdev-20`
         }
     ];
 
