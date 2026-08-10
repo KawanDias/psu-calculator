@@ -83,13 +83,17 @@ function setSearchStatus(message) {
     searchStatus.textContent = message || '';
 }
 
-function showLoadingState() {
-    psuGrid.innerHTML = `
-        <div class="rounded-3xl border border-slate-800 bg-slate-950/90 p-6 text-center text-slate-300">
-            <p class="text-base font-semibold text-slate-100">${LOADING_MESSAGE}</p>
-            <p class="mt-2 text-sm text-slate-400">Aguarde enquanto buscamos ofertas reais de fontes para a sua potência recomendada.</p>
+function showSkeletons() {
+    psuGrid.innerHTML = Array.from({ length: 3 }).map(() => `
+        <div class="rounded-3xl border border-slate-800 bg-slate-950/90 p-4 animate-pulse">
+            <div class="h-40 w-full rounded-2xl bg-slate-800"></div>
+            <div class="mt-4 space-y-3">
+                <div class="h-4 w-5/6 rounded-full bg-slate-800"></div>
+                <div class="h-4 w-1/2 rounded-full bg-slate-800"></div>
+                <div class="h-10 rounded-2xl bg-slate-800"></div>
+            </div>
         </div>
-    `;
+    `).join('');
 }
 
 function renderPsuCards(psus) {
@@ -104,16 +108,16 @@ function renderPsuCards(psus) {
     }
 
     psuGrid.innerHTML = psus
-        .map(psu => `
+        .map(item => `
             <div class="rounded-3xl border border-slate-800 bg-slate-900 p-4 shadow-sm shadow-slate-950/20">
                 <div class="overflow-hidden rounded-3xl bg-slate-800">
-                    <img src="${psu.image}" alt="${psu.title}" class="h-40 w-full object-cover" />
+                    <img src="${item.image}" alt="${item.title}" class="h-40 w-full object-contain rounded-xl bg-slate-950 p-2" />
                 </div>
                 <div class="mt-4 space-y-3">
-                    <p class="text-lg font-semibold text-slate-100">${psu.title}</p>
-                    <p class="text-sm text-slate-300">${psu.price}</p>
-                    <a href="${psu.url}" target="_blank" rel="noopener noreferrer" class="inline-flex w-full justify-center rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500">
-                        Ver Oferta
+                    <h3 class="font-semibold text-slate-100 text-sm line-clamp-2">${item.title}</h3>
+                    <p class="text-indigo-400 font-bold mt-1">${item.price}</p>
+                    <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="mt-3 inline-block w-full text-center bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-xl text-sm font-semibold transition">
+                        Ver Oferta / Menor Preço
                     </a>
                 </div>
             </div>
@@ -167,14 +171,15 @@ async function handleSubmit(event) {
 
     resultPlaceholder.classList.add('hidden');
     resultBlock.classList.remove('hidden');
-    setSearchStatus(LOADING_MESSAGE);
+    psuGrid.innerHTML = '';
+    setSearchStatus('Buscando melhores ofertas e preços em tempo real...');
+    showSkeletons();
     updateResults({ consumption: totalSystemWatts, bottleneck });
-    showLoadingState();
 
     try {
-        const psus = await fetchPsuOffers(recommendedWatts);
+        const data = await fetchPsuOffers(recommendedWatts);
         setSearchStatus('');
-        renderPsuCards(psus);
+        renderPsuCards(data);
     } catch (error) {
         setSearchStatus('Não foi possível carregar ofertas ao vivo. Mostrando resultados locais.');
         renderPsuCards([]);

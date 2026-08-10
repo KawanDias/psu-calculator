@@ -5,26 +5,6 @@ const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
 const TIMEOUT_MS = 12000;
 const PLACEHOLDER_PATTERNS = ['via.placeholder', 'placeholder', 'example.com', 'dummyimage', 'blank', 'spacer.gif', 'missing', 'default'];
 
-const FALLBACK_RESULTS = [
-    {
-        title: 'Corsair RM650x 650W 80 Plus Gold',
-        price: 'R$ 1.199,00',
-        image: 'https://m.media-amazon.com/images/I/71V8I7mwpUL._AC_SL1500_.jpg',
-        url: 'https://lista.mercadolivre.com.br/fonte-corsair-rm650x-650w-80-plus-gold'
-    },
-    {
-        title: 'MSI MPG A650GF 650W 80 Plus Gold',
-        price: 'R$ 1.049,00',
-        image: 'https://m.media-amazon.com/images/I/71xFw3zJd5L._AC_SL1500_.jpg',
-        url: 'https://lista.mercadolivre.com.br/fonte-msi-mpg-a650gf-650w-80-plus-gold'
-    },
-    {
-        title: 'Cooler Master MWE Gold 750W 80 Plus',
-        price: 'R$ 950,00',
-        image: 'https://m.media-amazon.com/images/I/61Y8uqxqFwL._AC_SL1500_.jpg',
-        url: 'https://lista.mercadolivre.com.br/fonte-cooler-master-mwe-gold-750w'
-    }
-];
 
 function normalizeUrl(value, baseUrl) {
     if (!value || typeof value !== 'string') {
@@ -174,7 +154,26 @@ function createFallbackResponse(wattage) {
         source: 'fallback',
         fallback: true,
         wattage,
-        results: FALLBACK_RESULTS
+        results: [
+            {
+                title: `Fonte ${wattage}W 80 Plus Bronze / Gold (KaBuM!)`,
+                price: 'Ver Menor Preço',
+                image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=400&auto=format&fit=crop',
+                url: `https://www.kabum.com.br/busca?query=fonte+${wattage}w+80+plus`
+            },
+            {
+                title: `Fonte ${wattage}W 80 Plus Gold (Mercado Livre)`,
+                price: 'Ver Menor Preço',
+                image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=400&auto=format&fit=crop',
+                url: `https://lista.mercadolivre.com.br/fonte-${wattage}w-80-plus`
+            },
+            {
+                title: `Fonte ${wattage}W 80 Plus (Amazon)`,
+                price: 'Ver Menor Preço',
+                image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=400&auto=format&fit=crop',
+                url: `https://www.amazon.com.br/s?k=fonte+${wattage}w+80+plus`
+            }
+        ]
     };
 }
 
