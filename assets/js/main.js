@@ -104,6 +104,9 @@ function renderPsuCards(psus) {
                     <img src="${item.image}" alt="${item.title}" class="h-40 w-full object-contain rounded-xl bg-slate-950 p-2" />
                 </div>
                 <div class="mt-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="rounded-full bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-300">${item.store || ''}</span>
+                    </div>
                     <h3 class="font-semibold text-slate-100 text-sm line-clamp-2">${item.title}</h3>
                     <p class="text-indigo-400 font-bold mt-1">${item.price}</p>
                     <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="mt-3 inline-block w-full text-center bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-xl text-sm font-semibold transition">
@@ -122,24 +125,7 @@ function updateResults({ consumption, bottleneck }) {
     bottleneckBar.style.width = `${bottleneck.ratio}%`;
 }
 
-async function fetchPsuOffers(wattage) {
-    const response = await fetch(`/api/search?wattage=${encodeURIComponent(wattage)}`, {
-        headers: {
-            'Accept': 'application/json'
-        }
-    });
-
-    if (!response.ok) {
-        throw new Error('Falha ao buscar ofertas de fonte em tempo real.');
-    }
-
-    const data = await response.json();
-    if (!Array.isArray(data.results)) {
-        throw new Error('Resposta inválida da API de busca.');
-    }
-
-    return data.results;
-}
+// fetch removed — suggestions are generated client-side to avoid backend failures
 
 async function handleSubmit(event) {
     event.preventDefault();
@@ -156,25 +142,48 @@ async function handleSubmit(event) {
     const gpu = getHardwareItem(hardwareData.gpus, selectedGpuId);
 
     const totalSystemWatts = cpu.tdp + gpu.tdp + BASE_SYSTEM_WATTS;
-    const recommendedWatts = Math.ceil(totalSystemWatts * SAFETY_MARGIN / 50) * 50;
     const bottleneck = evaluateBottleneck(cpu.score, gpu.score);
+
+    // determine recommended commercial wattage
+    const rawRequired = Math.ceil(totalSystemWatts * SAFETY_MARGIN);
+    const STANDARD_WATTAGES = [500, 550, 600, 650, 750, 850, 1000, 1200];
+    let recommendedWattage = STANDARD_WATTAGES.find(w => w >= rawRequired);
+    if (!recommendedWattage) recommendedWattage = STANDARD_WATTAGES[STANDARD_WATTAGES.length - 1];
 
     resultPlaceholder.classList.add('hidden');
     resultBlock.classList.remove('hidden');
     psuGrid.innerHTML = '';
-    setSearchStatus('Buscando melhores ofertas e preços em tempo real...');
+    setSearchStatus('Opções recomendadas para o seu sistema:');
     showSkeletons();
     updateResults({ consumption: totalSystemWatts, bottleneck });
 
-    try {
-        const data = await fetchPsuOffers(recommendedWatts);
-        setSearchStatus('');
-        renderPsuCards(data);
-    } catch (error) {
-        setSearchStatus('');
-        renderPsuCards([]);
-        console.error(error);
-    }
+    // generate 3 client-side suggestions with direct search links
+    const suggestions = [
+        {
+            title: `Fonte ATX ${recommendedWattage}W 80 Plus`,
+            store: 'KaBuM!',
+            price: 'Ver ofertas em tempo real',
+            image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=400&auto=format&fit=crop',
+            url: `https://www.kabum.com.br/busca?query=fonte+${recommendedWattage}w+80+plus`
+        },
+        {
+            title: `Fonte Modular ${recommendedWattage}W 80 Plus Gold`,
+            store: 'Mercado Livre',
+            price: 'Ver ofertas em tempo real',
+            image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=400&auto=format&fit=crop',
+            url: `https://lista.mercadolivre.com.br/fonte-${recommendedWattage}w-80-plus`
+        },
+        {
+            title: `Fonte de Alimentação ${recommendedWattage}W PC`,
+            store: 'Amazon',
+            price: 'Ver ofertas em tempo real',
+            image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=400&auto=format&fit=crop',
+            url: `https://www.amazon.com.br/s?k=fonte+${recommendedWattage}w+80+plus`
+        }
+    ];
+
+    // immediately render the generated suggestions
+    renderPsuCards(suggestions);
 }
 
 populateSelects();
