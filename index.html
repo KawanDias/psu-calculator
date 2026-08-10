@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+        content="Calculadora de consumo de hardware, recomendação de fonte e gargalo para gamers e criadores." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Calculadora de Hardware - Fonte e Gargalo" />
+    <meta property="og:description"
+        content="Estimativa de consumo de hardware, recomendação de fonte e diagnóstico de gargalo para gamers e criadores de conteúdo." />
+    <meta property="og:image" content="https://example.com/og-image.png" />
+    <meta property="og:url" content="https://seusite.com" />
+    <meta property="og:site_name" content="Calculadora de Hardware" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Calculadora de Hardware - Fonte e Gargalo" />
+    <meta name="twitter:description"
+        content="Estimativa de consumo de hardware, recomendação de fonte e diagnóstico de gargalo para gamers e criadores de conteúdo." />
+    <meta name="twitter:image" content="https://example.com/og-image.png" />
+    <meta name="twitter:creator" content="@seuusuario" />
+    <title>Calculadora de Hardware - Fonte e Gargalo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#6366f1',
+                            600: '#4f46e5'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+    <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+        <header class="mb-10 text-center">
+            <p class="text-sm uppercase tracking-[0.3em] text-slate-400">Calculadora</p>
+            <h1 class="mt-3 text-3xl font-semibold tracking-tight text-slate-100 sm:text-4xl">Consumo de Fonte &amp;
+                Gargalo</h1>
+            <p class="mx-auto mt-4 max-w-2xl text-slate-400 sm:text-lg">
+                Estime o consumo do seu PC, receba a fonte recomendada e entenda se há gargalo entre CPU e GPU.
+            </p>
+        </header>
+
+        <main class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+            <section class="space-y-6">
+                <div class="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-xl shadow-slate-950/20">
+                    <div class="mb-6 flex items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-semibold text-slate-100">Configuração do sistema</h2>
+                            <p class="mt-1 text-sm text-slate-400">Escolha a CPU, GPU e o perfil de uso para obter
+                                resultados.</p>
+                        </div>
+                        <div
+                            class="inline-flex items-center rounded-full bg-slate-800 px-3 py-1 text-sm text-slate-300">
+                            100% client-side
+                        </div>
+                    </div>
+
+                    <form id="hardware-form" class="space-y-5">
+                        <div>
+                            <label for="cpu-select" class="mb-2 block text-sm font-medium text-slate-200">Processador
+                                (CPU)</label>
+                            <select id="cpu-select"
+                                class="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20">
+                                <option value="" disabled selected>Selecione uma CPU</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="gpu-select" class="mb-2 block text-sm font-medium text-slate-200">Placa de vídeo
+                                (GPU)</label>
+                            <select id="gpu-select"
+                                class="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20">
+                                <option value="" disabled selected>Selecione uma GPU</option>
+                            </select>
+                        </div>
+
+                        <fieldset class="rounded-3xl border border-slate-800 bg-slate-950/70 p-4">
+                            <legend class="px-2 text-sm font-semibold text-slate-200">Perfil de uso</legend>
+                            <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                                <label
+                                    class="flex cursor-pointer items-center rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 transition hover:border-brand-500">
+                                    <input type="radio" name="profile" value="1080p"
+                                        class="mr-3 h-4 w-4 accent-brand-500" checked />
+                                    <span class="text-sm text-slate-200">Jogos 1080p</span>
+                                </label>
+                                <label
+                                    class="flex cursor-pointer items-center rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 transition hover:border-brand-500">
+                                    <input type="radio" name="profile" value="4k"
+                                        class="mr-3 h-4 w-4 accent-brand-500" />
+                                    <span class="text-sm text-slate-200">Jogos 4K</span>
+                                </label>
+                                <label
+                                    class="flex cursor-pointer items-center rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 transition hover:border-brand-500">
+                                    <input type="radio" name="profile" value="render"
+                                        class="mr-3 h-4 w-4 accent-brand-500" />
+                                    <span class="text-sm text-slate-200">Edição de vídeo / Render</span>
+                                </label>
+                            </div>
+                        </fieldset>
+
+                        <button type="submit"
+                            class="inline-flex w-full items-center justify-center rounded-2xl bg-indigo-600 px-6 py-3 text-base font-semibold text-white transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400/30">
+                            Calcular Requisitos
+                        </button>
+                    </form>
+                </div>
+
+                <div class="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-xl shadow-slate-950/20">
+                    <h2 class="text-xl font-semibold text-slate-100">Detalhes do cálculo</h2>
+                    <div class="mt-5 space-y-4 text-slate-300">
+                        <p>Usamos o TDP da CPU e GPU mais 100W base para RAM, placa-mãe e armazenamento. Em seguida
+                            aplicamos 25% de margem para indicar a fonte mais eficiente.</p>
+                        <p>O gargalo é estimado comparando o score sintético da CPU e da GPU. Isso ajuda a entender se o
+                            sistema está equilibrado para jogos e criação de conteúdo.</p>
+                        <p>Recomendamos a menor fonte disponível que suporte a potência calculada com segurança.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="space-y-6">
+                <div class="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-xl shadow-slate-950/20">
+                    <div class="mb-4 flex items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-semibold text-slate-100">Resultados</h2>
+                            <p class="mt-1 text-sm text-slate-400">Veja consumo, fonte recomendada e gargalo estimado.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="result-placeholder"
+                        class="rounded-3xl border border-slate-800 bg-slate-950/90 p-5 text-slate-400">
+                        <p class="text-base">Preencha a CPU e a GPU acima e clique em Calcular para ver o consumo
+                            estimado e a recomendação de fonte.</p>
+                    </div>
+
+                    <div id="result-block" class="hidden space-y-5 transition duration-300">
+                        <div class="rounded-3xl border border-slate-800 bg-slate-950/90 p-5">
+                            <p class="text-sm uppercase tracking-[0.24em] text-slate-400">Consumo estimado</p>
+                            <p id="power-output" class="mt-3 text-4xl font-semibold text-slate-100">-- W</p>
+                            <p id="power-details" class="mt-2 text-sm text-slate-400">Inclui 100W adicionais para outros
+                                componentes.</p>
+                        </div>
+
+                        <div class="rounded-3xl border border-slate-800 bg-slate-950/90 p-5">
+                            <p class="text-sm uppercase tracking-[0.24em] text-slate-400">Fonte recomendada</p>
+                            <div id="psu-card" class="mt-4 grid gap-4">
+                                <div class="space-y-3">
+                                    <p id="psu-name" class="text-xl font-semibold leading-tight text-slate-100">--</p>
+                                    <p id="psu-power" class="text-sm text-slate-300">--</p>
+                                    <span id="psu-rating"
+                                        class="inline-flex rounded-full bg-slate-800 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-slate-300">--</span>
+                                </div>
+                                <div class="overflow-hidden rounded-3xl bg-slate-800 p-4">
+                                    <img id="psu-image"
+                                        src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=600&q=80"
+                                        alt="Fonte de alimentação" class="h-56 w-full object-cover rounded-3xl" />
+                                </div>
+                                <a id="psu-link" href="#" target="_blank" rel="noreferrer"
+                                    class="inline-flex w-full justify-center rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500">
+                                    Ver Oferta / Menor Preço
+                                </a>
+                            </div>
+                        </div>
+
+                        <div id="bottleneck-card" class="rounded-3xl border border-slate-800 bg-slate-950/90 p-5">
+                            <p class="text-sm uppercase tracking-[0.24em] text-slate-400">Gargalo estimado</p>
+                            <p id="bottleneck-text" class="mt-3 text-lg font-semibold text-slate-100">Escolha CPU e GPU
+                                para analisar.</p>
+                            <div class="mt-4 h-3 overflow-hidden rounded-full bg-slate-800">
+                                <div id="bottleneck-bar"
+                                    class="h-full rounded-full bg-gradient-to-r from-indigo-500 to-cyan-400"
+                                    style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-xl shadow-slate-950/20">
+                    <h2 class="text-xl font-semibold text-slate-100">Mais sobre consumo e fonte</h2>
+                    <div class="mt-5 space-y-4 text-slate-300">
+                        <p>O cálculo de consumo soma o TDP da CPU e GPU e adiciona uma margem base para RAM, placa-mãe e
+                            armazenamento. Isso cria uma estimativa mais realista do total de energia demandada pelo
+                            sistema.</p>
+                        <p>Garantir uma margem de segurança de 25% evita que a fonte trabalhe no limite constante,
+                            aumentando a estabilidade, a eficiência e a vida útil do conjunto.</p>
+                        <p>O gargalo indica qual componente limita o desempenho. Um sistema equilibrado evita que uma
+                            GPU muito poderosa seja limitada por uma CPU fraca, ou vice-versa.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="mt-12 border-t border-slate-800 pt-6 text-slate-500">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <p>Projeto estático para estimativa de consumo e gargalo. Sem backend, 100% client-side.</p>
+                <div class="flex flex-wrap gap-4 text-sm">
+                    <a href="#" data-page="about" class="transition hover:text-slate-100">Sobre o Projeto</a>
+                    <a href="#" data-page="terms" class="transition hover:text-slate-100">Termos de Uso</a>
+                    <a href="#" data-page="privacy" class="transition hover:text-slate-100">Política de Privacidade</a>
+                </div>
+            </div>
+            <p class="mt-4 text-sm text-slate-500">Desenvolvido por um estudante de ADS apaixonado por hardware.
+                Ferramenta 100% gratuita para ajudar gamers e criadores de conteúdo.</p>
+        </footer>
+    </div>
+
+    <div id="page-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 px-4 py-8">
+        <div class="w-full max-w-2xl overflow-hidden rounded-3xl bg-slate-900 shadow-2xl shadow-slate-950/60">
+            <div class="flex items-start justify-between border-b border-slate-800 px-6 py-5">
+                <div>
+                    <h3 id="modal-title" class="text-xl font-semibold text-slate-100"></h3>
+                    <p id="modal-subtitle" class="mt-1 text-sm text-slate-400"></p>
+                </div>
+                <button id="modal-close"
+                    class="text-3xl font-semibold leading-none text-slate-400 transition hover:text-slate-100"
+                    aria-label="Fechar modal">&times;</button>
+            </div>
+            <div class="max-h-[70vh] overflow-y-auto px-6 py-5 text-slate-300">
+                <div id="modal-content" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+
+</html>
