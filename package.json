@@ -4,7 +4,6 @@
     "private": true,
     "type": "module",
     "dependencies": {
-        "cheerio": "^1.0.0-rc.12",
-        "node-fetch": "^3.4.2"
+        "cheerio": "^1.0.0-rc.12"
     }
 }
