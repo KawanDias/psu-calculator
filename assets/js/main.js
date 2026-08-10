@@ -110,22 +110,23 @@ function showSkeletons() {
 function renderPsuCards(psus) {
     psuGrid.innerHTML = (Array.isArray(psus) ? psus : [])
         .map(item => `
-            <div class="rounded-3xl border border-slate-800 bg-slate-900 p-4 shadow-sm shadow-slate-950/20">
-                <div class="overflow-hidden rounded-3xl bg-slate-800">
-                    <img src="${item.image}" alt="${item.title}" class="h-40 w-full object-contain rounded-xl bg-slate-950 p-2" />
-                </div>
-                <div class="mt-4 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="rounded-full bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-300">${item.store || ''}</span>
-                    </div>
-                    <h3 class="font-semibold text-slate-100 text-sm line-clamp-2">${item.title}</h3>
-                    <p class="text-indigo-400 font-bold mt-1">${item.price}</p>
-                    <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="mt-3 inline-block w-full text-center bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-xl text-sm font-semibold transition">
-                        Ver Oferta / Menor Preço
-                    </a>
-                </div>
-            </div>
-        `)
+                                                <div class="flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900 p-4 transition hover:border-indigo-500/50">
+                                                    <div>
+                                                        <div class="relative flex h-36 w-full items-center justify-center rounded-xl bg-slate-950 border border-slate-800/80 mb-3">
+                                                            <span class="absolute top-2 left-2 rounded-md bg-indigo-950/80 px-2.5 py-1 text-xs font-bold text-indigo-400 border border-indigo-800/50">
+                                                                ${item.store}
+                                                            </span>
+                                                            <svg class="h-16 w-16 text-indigo-400/80" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                                            </svg>
+                                                        </div>
+                                                        <h3 class="text-sm font-semibold text-slate-100 line-clamp-2">${item.title}</h3>
+                                                    </div>
+                                                    <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="mt-4 block w-full rounded-xl bg-indigo-600 hover:bg-indigo-500 py-2.5 text-center text-xs font-semibold text-white transition shadow-md">
+                                                        Ver Oferta
+                                                    </a>
+                                                </div>
+                                `)
         .join('');
 }
 
@@ -188,22 +189,16 @@ async function handleSubmit(event) {
         {
             title: `Fonte ATX ${recommendedWattage}W 80 Plus`,
             store: 'KaBuM!',
-            price: 'Ver ofertas em tempo real',
-            image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=400&auto=format&fit=crop',
             url: `https://www.kabum.com.br/busca?query=fonte+${recommendedWattage}w+80+plus`
         },
         {
             title: `Fonte Modular ${recommendedWattage}W 80 Plus Gold`,
             store: 'Mercado Livre',
-            price: 'Ver ofertas em tempo real',
-            image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=400&auto=format&fit=crop',
             url: `https://lista.mercadolivre.com.br/fonte-${recommendedWattage}w-80-plus`
         },
         {
             title: `Fonte de Alimentação ${recommendedWattage}W PC`,
             store: 'Amazon',
-            price: 'Ver ofertas em tempo real',
-            image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=400&auto=format&fit=crop',
             url: `https://www.amazon.com.br/s?k=fonte+${recommendedWattage}w+80+plus`
         }
     ];
