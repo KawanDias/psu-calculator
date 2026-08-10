@@ -8,6 +8,7 @@ const bottleneckText = document.querySelector('#bottleneck-text');
 const bottleneckBar = document.querySelector('#bottleneck-bar');
 const resultBlock = document.querySelector('#result-block');
 const resultPlaceholder = document.querySelector('#result-placeholder');
+const searchStatus = document.querySelector('#search-status');
 const pageLinks = document.querySelectorAll('[data-page]');
 const modal = document.querySelector('#page-modal');
 const modalTitle = document.querySelector('#modal-title');
@@ -17,6 +18,7 @@ const modalClose = document.querySelector('#modal-close');
 
 const BASE_SYSTEM_WATTS = 100;
 const SAFETY_MARGIN = 1.25;
+const LOADING_MESSAGE = 'Buscando as melhores ofertas de fontes em tempo real...';
 
 function createOption(item) {
     const option = document.createElement('option');
@@ -36,22 +38,6 @@ function getHardwareItem(list, id) {
 
 function formatWatts(value) {
     return `${value.toFixed(0)} W`;
-}
-
-function selectRecommendedPsus(requiredPower) {
-    const candidates = hardwareData.psus
-        .filter(psu => psu.power >= requiredPower)
-        .sort((a, b) => a.power - b.power)
-        .slice(0, 3);
-
-    if (candidates.length > 0) {
-        return candidates;
-    }
-
-    return hardwareData.psus
-        .slice()
-        .sort((a, b) => a.power - b.power)
-        .slice(-3);
 }
 
 function openModal(pageKey) {
@@ -93,21 +79,41 @@ function evaluateBottleneck(cpuScore, gpuScore) {
     };
 }
 
+function setSearchStatus(message) {
+    searchStatus.textContent = message || '';
+}
+
+function showLoadingState() {
+    psuGrid.innerHTML = `
+        <div class="rounded-3xl border border-slate-800 bg-slate-950/90 p-6 text-center text-slate-300">
+            <p class="text-base font-semibold text-slate-100">${LOADING_MESSAGE}</p>
+            <p class="mt-2 text-sm text-slate-400">Aguarde enquanto buscamos ofertas reais de fontes para a sua potência recomendada.</p>
+        </div>
+    `;
+}
+
 function renderPsuCards(psus) {
+    if (!Array.isArray(psus) || psus.length === 0) {
+        psuGrid.innerHTML = `
+            <div class="rounded-3xl border border-slate-800 bg-slate-950/90 p-6 text-center text-slate-400">
+                <p class="text-base font-semibold text-slate-100">Não foi possível encontrar ofertas reais no momento.</p>
+                <p class="mt-2 text-sm">Tente novamente em alguns instantes.</p>
+            </div>
+        `;
+        return;
+    }
+
     psuGrid.innerHTML = psus
         .map(psu => `
             <div class="rounded-3xl border border-slate-800 bg-slate-900 p-4 shadow-sm shadow-slate-950/20">
                 <div class="overflow-hidden rounded-3xl bg-slate-800">
-                    <img src="${psu.image}" alt="${psu.name}" class="h-40 w-full object-cover" />
+                    <img src="${psu.image}" alt="${psu.title}" class="h-40 w-full object-cover" />
                 </div>
                 <div class="mt-4 space-y-3">
-                    <p class="text-lg font-semibold text-slate-100">${psu.name}</p>
-                    <div class="flex flex-wrap items-center gap-2">
-                        <span class="rounded-full bg-slate-800 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-slate-300">${psu.rating}</span>
-                        <span class="text-sm text-slate-400">${psu.power}W</span>
-                    </div>
+                    <p class="text-lg font-semibold text-slate-100">${psu.title}</p>
+                    <p class="text-sm text-slate-300">${psu.price}</p>
                     <a href="${psu.url}" target="_blank" rel="noopener noreferrer" class="inline-flex w-full justify-center rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500">
-                        Ver Oferta / Menor Preço
+                        Ver Oferta
                     </a>
                 </div>
             </div>
@@ -115,16 +121,33 @@ function renderPsuCards(psus) {
         .join('');
 }
 
-function updateResults({ consumption, recommendedPsus, bottleneck }) {
+function updateResults({ consumption, bottleneck }) {
     powerOutput.textContent = formatWatts(consumption);
-    powerDetails.textContent = 'Inclui 100W adicionais para outros componentes e roteamento de reserva.';
-    renderPsuCards(recommendedPsus);
+    powerDetails.textContent = 'Inclui 100W adicionais para outros componentes e margem de segurança.';
     bottleneckText.textContent = bottleneck.label;
     bottleneckBar.style.width = `${bottleneck.ratio}%`;
-    resultBlock.classList.remove('opacity-80');
 }
 
-function handleSubmit(event) {
+async function fetchPsuOffers(wattage) {
+    const response = await fetch(`/api/search?wattage=${encodeURIComponent(wattage)}`, {
+        headers: {
+            'Accept': 'application/json'
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error('Falha ao buscar ofertas de fonte em tempo real.');
+    }
+
+    const data = await response.json();
+    if (!Array.isArray(data.results)) {
+        throw new Error('Resposta inválida da API de busca.');
+    }
+
+    return data.results;
+}
+
+async function handleSubmit(event) {
     event.preventDefault();
 
     const selectedCpuId = cpuSelect.value;
@@ -140,12 +163,23 @@ function handleSubmit(event) {
 
     const totalSystemWatts = cpu.tdp + gpu.tdp + BASE_SYSTEM_WATTS;
     const recommendedWatts = Math.ceil(totalSystemWatts * SAFETY_MARGIN / 50) * 50;
-    const recommendedPsus = selectRecommendedPsus(recommendedWatts);
     const bottleneck = evaluateBottleneck(cpu.score, gpu.score);
 
     resultPlaceholder.classList.add('hidden');
     resultBlock.classList.remove('hidden');
-    updateResults({ consumption: totalSystemWatts, recommendedPsus, bottleneck });
+    setSearchStatus(LOADING_MESSAGE);
+    updateResults({ consumption: totalSystemWatts, bottleneck });
+    showLoadingState();
+
+    try {
+        const psus = await fetchPsuOffers(recommendedWatts);
+        setSearchStatus('');
+        renderPsuCards(psus);
+    } catch (error) {
+        setSearchStatus('Não foi possível carregar ofertas ao vivo. Mostrando resultados locais.');
+        renderPsuCards([]);
+        console.error(error);
+    }
 }
 
 populateSelects();
