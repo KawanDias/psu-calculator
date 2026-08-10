@@ -97,17 +97,7 @@ function showSkeletons() {
 }
 
 function renderPsuCards(psus) {
-    if (!Array.isArray(psus) || psus.length === 0) {
-        psuGrid.innerHTML = `
-            <div class="rounded-3xl border border-slate-800 bg-slate-950/90 p-6 text-center text-slate-400">
-                <p class="text-base font-semibold text-slate-100">Não foi possível encontrar ofertas reais no momento.</p>
-                <p class="mt-2 text-sm">Tente novamente em alguns instantes.</p>
-            </div>
-        `;
-        return;
-    }
-
-    psuGrid.innerHTML = psus
+    psuGrid.innerHTML = (Array.isArray(psus) ? psus : [])
         .map(item => `
             <div class="rounded-3xl border border-slate-800 bg-slate-900 p-4 shadow-sm shadow-slate-950/20">
                 <div class="overflow-hidden rounded-3xl bg-slate-800">
@@ -181,7 +171,7 @@ async function handleSubmit(event) {
         setSearchStatus('');
         renderPsuCards(data);
     } catch (error) {
-        setSearchStatus('Não foi possível carregar ofertas ao vivo. Mostrando resultados locais.');
+        setSearchStatus('');
         renderPsuCards([]);
         console.error(error);
     }
